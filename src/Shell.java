@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Arrays;
+import java.util.Date;
 
 public class Shell {
 	
@@ -7,6 +8,9 @@ public class Shell {
 	private final static String user = System.getProperty("user.name");		// grabs user name
 	private static String currentDirName = System.getProperty("user.home");	// grabs home directory
 	private static File currentDir = new File(currentDirName);				//
+	 private File cwd;
+    	/** the instance of the current shell. */
+  	  private static Shell Shell = null;
 	
 	public static void main(String[] args) {
 		
@@ -38,12 +42,12 @@ public class Shell {
 			case "cd":
 				cd(argus);
 				break;
-                                                        case "quit":
-	                    		System.out.println("bye");
-	                    		System.exit(0);
 			default:
 				System.out.println("Command '" + command + "' not recognized");
-		}
+			case "quit":
+	                    		System.out.println("bye");
+	                    		System.exit(0);		
+}
 	}
 	
 	/*
@@ -70,7 +74,30 @@ public class Shell {
 			}
 		}
 	}
-	
+
+ /*
+     * the constructor for the Shell class.
+     * @parameter path - the path of the current directory of the shell
+     */
+    public Shell (String path) {
+      cwd = new File(path);
+    }
+
+    /**
+     * Shows the current directory as an absolute path. This command accepts no arguments.
+     * @parameter args - the arguments for this command
+     * @parameter args[0] - the name of the command
+     */
+    private void pwd (String[] args) {
+        // Show usage for the wrong number of arguments and ? as the only argument
+        if (((args.length == 2 && args[1].trim().equals("?"))) ||
+                args.length < 1 || args.length > 2) {
+            System.out.println("usage: pwd");
+            return;
+        }
+        System.out.println(cwd.getAbsolutePath());
+    }
+
 	/*
 	 * displays basic command prompt
 	 * shows username and current directory name
