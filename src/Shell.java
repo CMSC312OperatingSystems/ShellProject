@@ -38,6 +38,9 @@ public class Shell {
 			case "cd":
 				cd(argus);
 				break;
+                                                        case "quit":
+	                    		System.out.println("bye");
+	                    		System.exit(0);
 			default:
 				System.out.println("Command '" + command + "' not recognized");
 		}
