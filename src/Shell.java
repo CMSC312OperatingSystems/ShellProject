@@ -14,6 +14,7 @@ public class Shell {
 	private static Shell Shell = null;
 	private static boolean quit = false;
 	private static int lineCount = 0;
+
 	
 	public static void main(String[] args) {
 		
@@ -157,8 +158,8 @@ public class Shell {
 					lineCount++;
 				}
 	}
-	
-	 /*
+
+ /*
      * the constructor for the Shell class.
      * @parameter path - the path of the current directory of the shell
      */
@@ -182,7 +183,7 @@ public class Shell {
         System.out.println(cwd.getAbsolutePath());
         lineCount++;
     }
-	
+
 	/*
 	 * displays basic command prompt
 	 * shows username and current directory name
