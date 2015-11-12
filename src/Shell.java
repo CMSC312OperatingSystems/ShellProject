@@ -14,7 +14,6 @@ public class Shell {
 	private static Shell Shell = null;
 	private static boolean quit = false;
 	private static int lineCount = 0;
-
 	
 	public static void main(String[] args) {
 		
@@ -75,9 +74,12 @@ public class Shell {
 				
 			default:
 				System.out.println("Command '" + command + "' not recognized");
+
 				lineCount++;
 		}
-	}
+
+}
+
 	
 	/*
 	 * cd method is called when user enters cd command.
@@ -182,7 +184,9 @@ public class Shell {
         }
         System.out.println(cwd.getAbsolutePath());
         lineCount++;
-    }
+
+            return;
+     }
 
 	/*
 	 * displays basic command prompt
