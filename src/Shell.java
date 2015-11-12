@@ -1,25 +1,42 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 public class Shell {
 	
 	// ******** ENVIRONMENT VARIABLES ******** //
 	private final static String user = System.getProperty("user.name");		// grabs user name
 	private static String currentDirName = System.getProperty("user.home");	// grabs home directory
-	private static File currentDir = new File(currentDirName);				//
+	private static File currentDir = new File(currentDirName);	
+	 private File cwd;
+ 	/** the instance of the current shell. */
+	private static Shell Shell = null;
+	private static boolean quit = false;
+	private static int lineCount = 0;
 	
 	public static void main(String[] args) {
 		
 		// sets current directory to user's home directory
 		System.setProperty("user.dir", currentDirName);
+		loop(false);
 		
+	}
+	
+	/**
+	 * This is a loop that will make sure our prompt keeps going as long as a true value is not passed into it. 
+	 * When a true value is passed in it allows the user to exit our command prompt.
+	 * See switch statement.
+	 * @param q
+	 */
+	private static void loop(boolean q){
+		quit = q;
 		String input = "";
 		
-		// condition will need to be replaced with condition to check if user inputs 'quit' command
-		while (true) {
+		while( quit == false){
 			input = prompt();
 			parseInput(input);
-		}	
+		}
 	}
 	
 	/*
@@ -29,17 +46,35 @@ public class Shell {
 	private static void parseInput(String input) {
 		String[] inputTokens = input.split(" ");	// tokenizes input based on white space
 		String[] argus = new String[0]; 			// array for input arguments
-		String command = inputTokens[0];			// grabs command from input line, which should be first element of input
+		String command = inputTokens[0];		// grabs command from input line, which should be first element of input
 		if (inputTokens.length > 1) argus = Arrays.copyOfRange(inputTokens, 1, inputTokens.length); // separates rest of arguments
 		
 		// add other commands in switch statement
 		switch (command) {
-			case "": break;	// essentially do nothing when user presses enter
+			case "": 
+				break;	// essentially do nothing when user presses enter
+				
 			case "cd":
 				cd(argus);
 				break;
+			
+			case "clr":
+				clr();
+				System.out.println("Testing Line Count: " + lineCount);
+				break;
+				
+			case "dir":
+				dir(argus);
+				break;
+				
+			case "quit":
+				System.out.println("Exiting the shell...");
+				loop(true);
+				break;
+				
 			default:
 				System.out.println("Command '" + command + "' not recognized");
+				lineCount++;
 		}
 	}
 	
@@ -56,10 +91,14 @@ public class Shell {
 			File tmpFile = new File(tmp);	// creates temporary file object
 			try {
 				if (tmpFile.exists()) {		// checks if file object is actually a real directory
-					currentDir = tmpFile.getCanonicalFile();			// update currentDir environment variable
+					currentDir = tmpFile.getCanonicalFile();			        // update currentDir environment variable
 					currentDirName = currentDir.getAbsolutePath();		// update currentDirName environment variable
 					System.setProperty("user.dir", currentDirName);		// changes current working directory
-				} else System.out.println("no such file exists");
+				} 
+				else{
+					System.out.println("no such file exists");
+					lineCount++;
+				}
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -67,6 +106,82 @@ public class Shell {
 			}
 		}
 	}
+	
+	/**
+	 * This method should be able to clear the console screen and should activate when the user types clr.
+	 * This will work on a CentOs Redhat linux system.
+	 * Every time anything is printed to the screen we will be incrementing a counter lineCount that will 
+	 * Let us know how many lines have been printed. This way we can delete them to clear the screen.
+	 */
+	private static void clr(){
+		
+		// This will work on Linux.
+		
+		for (int n = 0; n < lineCount; n++){
+			System.out.print(String.format("\033[%dA", n));  //Move up n spaces. 
+			System.out.print("\033[2k"); 							  //Delete current line.
+		}
+	}
+	
+	/**
+	 * This method should be able to list all the current files in a directory.
+	 * This also takes in a parameter. 
+	 */
+	private static void dir(String[] arg){
+		
+		// If the argument is null then it will print the current directory because the 
+		// cd(arg) method won't change the currentDirName
+		cd(arg);
+		dirHelper(currentDirName);
+
+	}
+	
+	// This method does all the work for the dir function.
+	private static void dirHelper(String directory){
+		//Make an array of files based on the current directory you are in.
+		File[] currentDirectory = new File(currentDirName).listFiles();
+		//Make an ArrayList in which to put the names of the files.
+		ArrayList<String> directoryList = new ArrayList<String>();
+		//Iterate through the array of files and if there are files then add them to our string array.
+		//Print out the list as we are adding them. 
+			if(currentDirectory != null){
+				for(int i = 0; i < currentDirectory.length; i++){
+					directoryList.add(currentDirectory[i].getName());
+					System.out.println(directoryList.get(i));
+					lineCount++;
+				    }
+				}
+				//If there are no files in the list. 
+			else{
+					System.out.println("No files in current directory.");
+					lineCount++;
+				}
+	}
+	
+	 /*
+     * the constructor for the Shell class.
+     * @parameter path - the path of the current directory of the shell
+     */
+    public Shell (String path) {
+      cwd = new File(path);
+    }
+
+    /**
+     * Shows the current directory as an absolute path. This command accepts no arguments.
+     * @parameter args - the arguments for this command
+     * @parameter args[0] - the name of the command
+     */
+    private void pwd (String[] args) {
+        // Show usage for the wrong number of arguments and ? as the only argument
+        if (((args.length == 2 && args[1].trim().equals("?"))) ||
+                args.length < 1 || args.length > 2) {
+            System.out.println("usage: pwd");
+            lineCount++;
+            return;
+        }
+        System.out.println(cwd.getAbsolutePath());
+        lineCount++;
+    }
 	
 	/*
 	 * displays basic command prompt
@@ -77,6 +192,7 @@ public class Shell {
 		if (fileName.equals(user)) fileName = "~";		// displays if current directory is home
 		
 		System.out.print(user + " " + fileName + " >");
+		lineCount++;
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		String result = "";
 		try {
@@ -86,5 +202,4 @@ public class Shell {
 		}
 		return result;
 	}
-
 }
