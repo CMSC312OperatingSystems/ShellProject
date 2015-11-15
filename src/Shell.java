@@ -13,7 +13,7 @@ public class Shell {
  	/** the instance of the current shell. */
 	private static Shell Shell = null;
 	private static boolean quit = false;
-	private static int lineCount = 0;
+	private static int lineCount = 1;
 	
 	public static void main(String[] args) {
 		
@@ -60,7 +60,7 @@ public class Shell {
 			
 			case "clr":
 				clr();
-				System.out.println("Testing Line Count: " + lineCount);
+				// System.out.println("Testing Line Count: " + lineCount);
 				break;
 				
 			case "dir":
@@ -74,7 +74,6 @@ public class Shell {
 				
 			default:
 				System.out.println("Command '" + command + "' not recognized");
-
 				lineCount++;
 		}
 
@@ -87,7 +86,10 @@ public class Shell {
 	 * if no arguments are given with cd command, then prints current directory, much like pwd
 	 */
 	private static void cd(String[] argus) {
-		if (argus.length == 0) System.out.println(currentDirName); // pwd
+		if (argus.length == 0) { 
+			System.out.println(currentDirName); // pwd
+			lineCount++;
+		}
 		else {
 			String dir = argus[0];			// directory to change to
 			String tmp = currentDirName + "/" + dir;
@@ -121,8 +123,8 @@ public class Shell {
 		// This will work on Linux.
 		
 		for (int n = 0; n < lineCount; n++){
-			System.out.print(String.format("\033[%dA", n));  //Move up n spaces. 
-			System.out.print("\033[2k"); 							  //Delete current line.
+			System.out.print("\033[1A");  //Move up n spaces. 
+			System.out.print("\033[2K");  //Delete current line.
 		}
 	}
 	
@@ -156,8 +158,8 @@ public class Shell {
 				}
 				//If there are no files in the list. 
 			else{
-					System.out.println("No files in current directory.");
 					lineCount++;
+					System.out.println("No files in current directory.");
 				}
 	}
 
