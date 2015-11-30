@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Shell {
 	
@@ -60,11 +61,15 @@ public class Shell {
 			
 			case "clr":
 				clr();
-				// System.out.println("Testing Line Count: " + lineCount);
 				break;
 				
 			case "dir":
 				dir(argus);
+				break;
+				
+				//This will need to be changed later. 
+			case "full":
+				fullPath(argus);
 				break;
 				
 			case "quit":
@@ -126,6 +131,33 @@ public class Shell {
 			System.out.print("\033[1A");  //Move up n spaces. 
 			System.out.print("\033[2K");  //Delete current line.
 		}
+	}
+	
+	/**
+	* Shell should fork and execute programs as child processes.
+	*/
+	private static void fullPath(String[] command){
+		//Shell should contain a full path from where it was executed.
+		final File f = new File(Shell.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		System.out.println("Shell = " + f);
+		lineCount++;
+		 
+		Process process;
+		try {
+			// If the command passed in is not null. Start a new program based on the argument passed in.
+			if( command[0] != null){
+			  process = new ProcessBuilder().command(command[0]).inheritIO().start();
+			  //boolean finished = process.waitFor(1000, TimeUnit.MILLISECONDS);
+			}
+			else if( command[0] != null && command[1] != null){
+			  process = new ProcessBuilder().command(command[0], command[1]).inheritIO().start();
+			}
+			System.out.println("Press enter to return to the shell.");
+			lineCount++;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//ProcessBuilder pBuilder = new ProcessBuilder("my", "arg");
 	}
 	
 	/**
@@ -192,7 +224,7 @@ public class Shell {
 
 	/*
 	 * displays basic command prompt
-	 * shows username and current directory name
+	 * shows user name and current directory name
 	 */
 	private static String prompt() {
 		String fileName = currentDir.getName();
