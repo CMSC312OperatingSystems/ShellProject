@@ -52,6 +52,7 @@ public class Shell {
 		
 		// add other commands in switch statement
 		switch (command) {
+		
 			case "": 
 				break;	// essentially do nothing when user presses enter
 				
@@ -67,21 +68,21 @@ public class Shell {
 				dir(argus);
 				break;
 				
-				//This will need to be changed later. 
-			case "full":
-				fullPath(argus);
-				break;
-				
 			case "quit":
 				System.out.println("Exiting the shell...");
 				loop(true);
 				break;
 				
 			default:
-				System.out.println("Command '" + command + "' not recognized");
-				lineCount++;
+				
+				try{
+					fullPath(command, argus);
+					}
+					catch(IOException e){
+						System.out.println("Command '" + command + "' not recognized");
+						lineCount++;
+					}	
 		}
-
 }
 
 	
@@ -136,28 +137,23 @@ public class Shell {
 	/**
 	* Shell should fork and execute programs as child processes.
 	*/
-	private static void fullPath(String[] command){
+	private static void fullPath(String command, String[] extraCommands)throws IOException{
 		//Shell should contain a full path from where it was executed.
 		final File f = new File(Shell.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 		System.out.println("Shell = " + f);
 		lineCount++;
 		 
 		Process process;
-		try {
 			// If the command passed in is not null. Start a new program based on the argument passed in.
-			if( command[0] != null){
-			  process = new ProcessBuilder().command(command[0]).inheritIO().start();
-			  //boolean finished = process.waitFor(1000, TimeUnit.MILLISECONDS);
+		    // In java the process builder command forks a new process and executes. 
+			if( command!= null){
+			  process = new ProcessBuilder().command(command).inheritIO().start();
 			}
-			else if( command[0] != null && command[1] != null){
-			  process = new ProcessBuilder().command(command[0], command[1]).inheritIO().start();
+			else if( extraCommands[0] != null && extraCommands[1] != null){
+			  process = new ProcessBuilder().command(extraCommands[0], extraCommands[1]).inheritIO().start();
 			}
 			System.out.println("Press enter to return to the shell.");
 			lineCount++;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//ProcessBuilder pBuilder = new ProcessBuilder("my", "arg");
 	}
 	
 	/**
