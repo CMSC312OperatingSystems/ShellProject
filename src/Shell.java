@@ -9,7 +9,7 @@ public class Shell {
 	private final static String user = System.getProperty("user.name");		// grabs user name
 	private static String currentDirName = System.getProperty("user.home");	// grabs home directory
 	private static File currentDir = new File(currentDirName);	
-	 private File cwd;
+	private File cwd;
  	/** the instance of the current shell. */
 	private static Shell Shell = null;
 	private static boolean quit = false;
