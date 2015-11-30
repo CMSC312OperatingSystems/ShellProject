@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Shell {
 	
@@ -13,7 +14,7 @@ public class Shell {
  	/** the instance of the current shell. */
 	private static Shell Shell = null;
 	private static boolean quit = false;
-	private static int lineCount = 0;
+	private static int lineCount = 1;
 	
 	public static void main(String[] args) {
 		
@@ -60,11 +61,15 @@ public class Shell {
 			
 			case "clr":
 				clr();
-				System.out.println("Testing Line Count: " + lineCount);
 				break;
 				
 			case "dir":
 				dir(argus);
+				break;
+				
+				//This will need to be changed later. 
+			case "full":
+				fullPath(argus);
 				break;
 				
 			case "quit":
@@ -74,7 +79,6 @@ public class Shell {
 				
 			default:
 				System.out.println("Command '" + command + "' not recognized");
-
 				lineCount++;
 		}
 
@@ -87,7 +91,10 @@ public class Shell {
 	 * if no arguments are given with cd command, then prints current directory, much like pwd
 	 */
 	private static void cd(String[] argus) {
-		if (argus.length == 0) System.out.println(currentDirName); // pwd
+		if (argus.length == 0) { 
+			System.out.println(currentDirName); // pwd
+			lineCount++;
+		}
 		else {
 			String dir = argus[0];			// directory to change to
 			String tmp = currentDirName + "/" + dir;
@@ -121,9 +128,36 @@ public class Shell {
 		// This will work on Linux.
 		
 		for (int n = 0; n < lineCount; n++){
-			System.out.print(String.format("\033[%dA", n));  //Move up n spaces. 
-			System.out.print("\033[2k"); 							  //Delete current line.
+			System.out.print("\033[1A");  //Move up n spaces. 
+			System.out.print("\033[2K");  //Delete current line.
 		}
+	}
+	
+	/**
+	* Shell should fork and execute programs as child processes.
+	*/
+	private static void fullPath(String[] command){
+		//Shell should contain a full path from where it was executed.
+		final File f = new File(Shell.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		System.out.println("Shell = " + f);
+		lineCount++;
+		 
+		Process process;
+		try {
+			// If the command passed in is not null. Start a new program based on the argument passed in.
+			if( command[0] != null){
+			  process = new ProcessBuilder().command(command[0]).inheritIO().start();
+			  //boolean finished = process.waitFor(1000, TimeUnit.MILLISECONDS);
+			}
+			else if( command[0] != null && command[1] != null){
+			  process = new ProcessBuilder().command(command[0], command[1]).inheritIO().start();
+			}
+			System.out.println("Press enter to return to the shell.");
+			lineCount++;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//ProcessBuilder pBuilder = new ProcessBuilder("my", "arg");
 	}
 	
 	/**
@@ -156,8 +190,8 @@ public class Shell {
 				}
 				//If there are no files in the list. 
 			else{
-					System.out.println("No files in current directory.");
 					lineCount++;
+					System.out.println("No files in current directory.");
 				}
 	}
 
@@ -190,7 +224,7 @@ public class Shell {
 
 	/*
 	 * displays basic command prompt
-	 * shows username and current directory name
+	 * shows user name and current directory name
 	 */
 	private static String prompt() {
 		String fileName = currentDir.getName();
