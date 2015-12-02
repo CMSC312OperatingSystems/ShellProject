@@ -1,15 +1,12 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-<<<<<<< HEAD
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-=======
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
->>>>>>> origin/master
 
 public class Shell {
 	
@@ -93,16 +90,12 @@ public class Shell {
 			case "cd":
 				cd(argus);
 				break;
-<<<<<<< HEAD
         case "echo":
-            System.out.println( user + "\n" + currentDirName + "\n" + command + "\n");
+            echo(argus);
             break;
         case "environ":
             environ(argus);
             break;
-			default:
-			System.out.println("Command '" + command + "' not recognized");
-=======
 			
 			case "clr":
 				clr();
@@ -115,10 +108,7 @@ public class Shell {
 			case "quit":
 				quit();
 				break;
-				
-			default:
-
-				
+		default:
 				try{
 					fullPath(command, argus);
 					}
@@ -126,7 +116,6 @@ public class Shell {
 						System.out.println("Command '" + command + "' not recognized");
 						lineCount++;
 					}	
->>>>>>> origin/master
 		}
 }
 
@@ -170,7 +159,14 @@ public class Shell {
             String value = environMap.get(key);
             System.out.println("[" + key + "] " + value);}
  }
-
+private static void echo(String[] argus){   
+    String arguments = "";
+    for (int i = 0;i < argus.length; i++){
+      arguments = arguments + argus[i]+ " ";
+    }
+   System.out.println( user + "\n" + currentDirName + "\n" + arguments);
+   lineCount += 3;    
+}
 	
 	/**
 	 * This method should be able to clear the console screen and should activate when the user types clr.
