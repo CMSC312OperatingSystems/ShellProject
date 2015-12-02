@@ -1,15 +1,11 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-<<<<<<< HEAD
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-=======
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
->>>>>>> origin/master
+
 
 public class Shell {
 	
@@ -82,7 +78,6 @@ public class Shell {
 		String[] inputTokens = input.split(" ");	// tokenizes input based on white space
 		String[] argus = new String[0]; 			// array for input arguments
 		String command = inputTokens[0];		// grabs command from input line, which should be first element of input
-		if (inputTokens.length > 1) argus = Arrays.copyOfRange(inputTokens, 1, inputTokens.length); // separates rest of arguments
 		
 		// add other commands in switch statement
 		switch (command) {
@@ -93,17 +88,16 @@ public class Shell {
 			case "cd":
 				cd(argus);
 				break;
-<<<<<<< HEAD
-        case "echo":
-            System.out.println( user + "\n" + currentDirName + "\n" + command + "\n");
-            break;
-        case "environ":
-            environ(argus);
-            break;
-			default:
-			System.out.println("Command '" + command + "' not recognized");
-=======
-			
+
+	        case "echo":
+	            System.out.println( user + "\n" + currentDirName + "\n" + command + "\n");
+	            lineCount+=3;
+	            break;
+	            
+	        case "environ":
+	            environ(argus);
+	            break;
+	
 			case "clr":
 				clr();
 				break;
@@ -118,15 +112,14 @@ public class Shell {
 				
 			default:
 
-				
 				try{
-					fullPath(command, argus);
+					fullPath(inputTokens);
 					}
 					catch(IOException e){
 						System.out.println("Command '" + command + "' not recognized");
 						lineCount++;
 					}	
->>>>>>> origin/master
+
 		}
 }
 
@@ -162,14 +155,21 @@ public class Shell {
 			}
 		}
 	}
-  private static void environ(String[] argus){
-  Map<String, String> environMap = System.getenv();
-        SortedMap<String, String> sortedEnvironMap = new TreeMap<String, String>(environMap);
-        Set<String> keySet = sortedEnvironMap.keySet();
-      for (String key : keySet) {
-            String value = environMap.get(key);
-            System.out.println("[" + key + "] " + value);}
- }
+	
+	private static void environ(String[] argus) {
+		
+		Map<String, String> environMap = System.getenv();
+		SortedMap<String, String> sortedEnvironMap = new TreeMap<String, String>(environMap);
+		Set<String> keySet = sortedEnvironMap.keySet();
+		
+		lineCount += sortedEnvironMap.size();
+		
+		for (String key : keySet) {
+			String value = environMap.get(key);
+			System.out.println("[" + key + "] " + value);
+		}
+
+	}
 
 	
 	/**
@@ -192,7 +192,7 @@ public class Shell {
 	* Shell should fork and execute programs as child processes.
 	*/
 
-	private static void fullPath(String command, String[] extraCommands)throws IOException{
+	private static void fullPath(String[] commands)throws IOException{
 		//Shell should contain a full path from where it was executed.
 		final File f = new File(Shell.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 		System.out.println("Shell = " + f);
@@ -202,12 +202,7 @@ public class Shell {
 
 			// If the command passed in is not null. Start a new program based on the argument passed in.
 		    // In java the process builder command forks a new process and executes. 
-			if( command!= null){
-			  process = new ProcessBuilder().command(command).inheritIO().start();
-			}
-			else if( extraCommands[0] != null && extraCommands[1] != null){
-			  process = new ProcessBuilder().command(extraCommands[0], extraCommands[1]).inheritIO().start();
-			}
+			  process = new ProcessBuilder().command(commands).inheritIO().start();
 			System.out.println("Press enter to return to the shell.");
 			lineCount++;
 
@@ -256,26 +251,6 @@ public class Shell {
     	System.out.println("Exiting the shell...");
     	System.exit(0);
     }
-    
-
-    /**
-     * Shows the current directory as an absolute path. This command accepts no arguments.
-     * @parameter args - the arguments for this command
-     * @parameter args[0] - the name of the command
-     */
-    private void pwd (String[] args) {
-        // Show usage for the wrong number of arguments and ? as the only argument
-        if (((args.length == 2 && args[1].trim().equals("?"))) ||
-                args.length < 1 || args.length > 2) {
-            System.out.println("usage: pwd");
-            lineCount++;
-            return;
-        }
-        System.out.println(cwd.getAbsolutePath());
-        lineCount++;
-
-            return;
-     }
 
 	/*
 	 * displays basic command prompt
