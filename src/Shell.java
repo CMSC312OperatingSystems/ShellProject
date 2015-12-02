@@ -20,7 +20,34 @@ public class Shell {
 		
 		// sets current directory to user's home directory
 		System.setProperty("user.dir", currentDirName);
-		loop(false);
+		
+		if (args.length > 0) {
+		
+			String filename = args[0];
+			File file = new File(filename);
+			BufferedReader reader;
+			
+			try {
+				
+				reader = new BufferedReader(new FileReader(file));
+				
+				String inputCommand = "";
+				
+				while ( (inputCommand=reader.readLine()) != null ) {
+					parseInput(inputCommand);
+				}
+				
+				quit();
+				
+			} catch (IOException e) {
+				System.out.println(e.getMessage()); 
+				System.out.println("starting shell");
+				lineCount += 2;
+			}
+			
+		}
+		
+		loop();
 		
 	}
 	
@@ -30,8 +57,8 @@ public class Shell {
 	 * See switch statement.
 	 * @param q
 	 */
-	private static void loop(boolean q){
-		quit = q;
+	private static void loop(){
+		
 		String input = "";
 		
 		while( quit == false){
@@ -69,8 +96,7 @@ public class Shell {
 				break;
 				
 			case "quit":
-				System.out.println("Exiting the shell...");
-				loop(true);
+				quit();
 				break;
 				
 			default:
@@ -194,14 +220,16 @@ public class Shell {
 					System.out.println("No files in current directory.");
 				}
 	}
-
- /*
-     * the constructor for the Shell class.
-     * @parameter path - the path of the current directory of the shell
-     */
-    public Shell (String path) {
-      cwd = new File(path);
+    
+	/**
+	 * method is called when shell needs to quit.
+	 * pretty self-explanatory
+	 */
+    private static void quit() {
+    	System.out.println("Exiting the shell...");
+    	System.exit(0);
     }
+    
 
     /**
      * Shows the current directory as an absolute path. This command accepts no arguments.
