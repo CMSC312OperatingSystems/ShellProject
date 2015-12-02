@@ -1,5 +1,9 @@
 import java.io.*;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Shell {
 	
@@ -38,8 +42,14 @@ public class Shell {
 			case "cd":
 				cd(argus);
 				break;
+        case "echo":
+            System.out.println( user + "\n" + currentDirName + "\n" + command + "\n");
+            break;
+        case "environ":
+            environ(argus);
+            break;
 			default:
-				System.out.println("Command '" + command + "' not recognized");
+			System.out.println("Command '" + command + "' not recognized");
 		}
 	}
 	
@@ -67,6 +77,15 @@ public class Shell {
 			}
 		}
 	}
+  private static void environ(String[] argus){
+  Map<String, String> environMap = System.getenv();
+        SortedMap<String, String> sortedEnvironMap = new TreeMap<String, String>(environMap);
+        Set<String> keySet = sortedEnvironMap.keySet();
+      for (String key : keySet) {
+            String value = environMap.get(key);
+            System.out.println("[" + key + "] " + value);}
+ }
+
 	
 	/*
 	 * displays basic command prompt
