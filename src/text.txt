@@ -1,0 +1,5 @@
+cd
+dir
+cd Desktop/
+cd
+dir
