@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Shell {
 	
@@ -90,14 +91,14 @@ public class Shell {
 				break;
 
 	        case "echo":
-	            System.out.println( user + "\n" + currentDirName + "\n" + command + "\n");
-	            lineCount+=3;
+	            echo(argus);
 	            break;
 	            
 	        case "environ":
 	            environ(argus);
 	            break;
-	
+			
+
 			case "clr":
 				clr();
 				break;
@@ -109,19 +110,17 @@ public class Shell {
 			case "quit":
 				quit();
 				break;
-				
 			default:
 
 				try{
 					fullPath(inputTokens);
-					}
-					catch(IOException e){
-						System.out.println("Command '" + command + "' not recognized");
-						lineCount++;
-					}	
-
+				}
+				catch(IOException e){
+					System.out.println("Command '" + command + "' not recognized");
+					lineCount++;
+				}	
 		}
-}
+	}
 
 	
 	/*
@@ -155,20 +154,22 @@ public class Shell {
 			}
 		}
 	}
-	
-	private static void environ(String[] argus) {
-		
+
+	private static void environ(String[] argus){
 		Map<String, String> environMap = System.getenv();
 		SortedMap<String, String> sortedEnvironMap = new TreeMap<String, String>(environMap);
 		Set<String> keySet = sortedEnvironMap.keySet();
-		
-		lineCount += sortedEnvironMap.size();
-		
 		for (String key : keySet) {
 			String value = environMap.get(key);
-			System.out.println("[" + key + "] " + value);
+			System.out.println("[" + key + "] " + value);}
+	}
+	private static void echo(String[] argus){   
+		String arguments = "";
+		for (int i = 0;i < argus.length; i++){
+			arguments = arguments + argus[i]+ " ";
 		}
-
+		System.out.println( user + "\n" + currentDirName + "\n" + arguments);
+		lineCount += 3;    
 	}
 
 	
@@ -202,7 +203,7 @@ public class Shell {
 
 			// If the command passed in is not null. Start a new program based on the argument passed in.
 		    // In java the process builder command forks a new process and executes. 
-			  process = new ProcessBuilder().command(commands).inheritIO().start();
+			process = new ProcessBuilder().command(commands).inheritIO().start();
 			System.out.println("Press enter to return to the shell.");
 			lineCount++;
 
