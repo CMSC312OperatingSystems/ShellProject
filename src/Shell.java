@@ -7,6 +7,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.Scanner;
 
 public class Shell {
 	
@@ -97,7 +98,14 @@ public class Shell {
 	        case "environ":
 	            environ(argus);
 	            break;
-			
+	            
+			case "pause":
+				pause();
+				break;
+				
+			case "help":
+				help();
+				break;
 
 			case "clr":
 				clr();
@@ -110,6 +118,7 @@ public class Shell {
 			case "quit":
 				quit();
 				break;
+				
 			default:
 
 				try{
