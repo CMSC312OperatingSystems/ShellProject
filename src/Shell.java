@@ -193,7 +193,8 @@ public class Shell {
 	* Shell should fork and execute programs as child processes.
 	*/
 
-	private static void fullPath(String[] commands)throws IOException{
+	private static void fullPath(String[] commands) throws IOException {
+		
 		//Shell should contain a full path from where it was executed.
 		final File f = new File(Shell.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 		System.out.println("Shell = " + f);
@@ -201,11 +202,13 @@ public class Shell {
 		 
 		Process process;
 
-			// If the command passed in is not null. Start a new program based on the argument passed in.
-		    // In java the process builder command forks a new process and executes. 
-			process = new ProcessBuilder().command(commands).inheritIO().start();
-			System.out.println("Press enter to return to the shell.");
-			lineCount++;
+		Thread thread = new Thread();
+		
+		
+	    // In java the process builder command forks a new process and executes. 
+		process = new ProcessBuilder().command(commands).inheritIO().start();
+		System.out.println("Press enter to return to the shell.");
+		lineCount++;
 
 	}
 	
