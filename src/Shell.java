@@ -275,4 +275,49 @@ public class Shell {
 		}
 		return result;
 	}
+	
+	
+	private static void help(){
+	       
+		  BufferedReader br = null;
+		  String line = null;
+		  
+		  try{
+			  br = new BufferedReader(new FileReader("User Manual.txt"));	  
+		  }
+		  
+		  catch(FileNotFoundException e){
+			  System.out.println(e.getMessage() + "The file was not found");
+		  }
+		  
+		  try{
+			  while((line = br.readLine()) != null){
+				  System.out.println(line);
+			  }
+		  }
+		  
+		  catch(IOException ex){
+			  System.out.println(ex.getMessage() + "Error reading file");
+		  }
+		  
+		  
+	  }
+	  /*
+	   * The program remains paused until Enter is pressed
+	   */
+	 private static void pause(){
+		System.out.println("Press enter to unpause the shell");
+		boolean isPaused = true;
+		Scanner scan = new Scanner(System.in);
+		
+		while(isPaused){
+			String input = scan.nextLine();
+			
+			if(input.equals(""))
+				isPaused = false;
+		}	
+		
+	 }
+	
+	
 }
