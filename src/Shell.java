@@ -321,6 +321,7 @@ public class Shell {
 		
 		while(isPaused){
 			String input = scan.nextLine();
+			lineCount++;
 			
 			if(input.equals(""))
 				isPaused = false;
