@@ -1,12 +1,10 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.Scanner;
 
 public class Shell {
@@ -25,6 +23,7 @@ public class Shell {
 		
 		// sets current directory to user's home directory
 		System.setProperty("user.dir", currentDirName);
+		
 		
 		if (args.length > 0) {
 		
@@ -52,7 +51,7 @@ public class Shell {
 			
 		}
 		
-		loop();
+		loop(false);
 		
 	}
 	
@@ -62,8 +61,8 @@ public class Shell {
 	 * See switch statement.
 	 * @param q
 	 */
-	private static void loop(){
-		
+	private static void loop(boolean q){
+		quit = q;
 		String input = "";
 		
 		while( quit == false){
@@ -77,36 +76,20 @@ public class Shell {
 	 * this method will have to be augmented with more commands as we add more functionality
 	 */
 	private static void parseInput(String input) {
-		String[] inputTokens = input.split(" ");	// tokenizes input based on white space
-		String[] argus = new String[0]; 			// array for input arguments
+		String[] inputTokens = input.split(" ");// tokenizes input based on white space
+		String[] argus = new String[0]; 		// array for input arguments
 		String command = inputTokens[0];		// grabs command from input line, which should be first element of input
+		if (inputTokens.length > 1) argus = Arrays.copyOfRange(inputTokens, 1, inputTokens.length); // separates rest of arguments
 		
 		// add other commands in switch statement
 		switch (command) {
-		
 			case "": 
 				break;	// essentially do nothing when user presses enter
 				
 			case "cd":
 				cd(argus);
 				break;
-
-	        case "echo":
-	            echo(argus);
-	            break;
-	            
-	        case "environ":
-	            environ(argus);
-	            break;
-	            
-			case "pause":
-				pause();
-				break;
-				
-			case "help":
-				help();
-				break;
-
+			
 			case "clr":
 				clr();
 				break;
@@ -115,22 +98,38 @@ public class Shell {
 				dir(argus);
 				break;
 				
+			case "echo":
+	            echo(argus);
+	            break;
+
+			case "environ":
+	            environ(argus);
+	            break;
+	            
+	        case "help":
+				help();
+				break;
+	            
+	        case "pause":
+				pause();
+				break;
+				
 			case "quit":
 				quit();
 				break;
 				
 			default:
-
 				try{
+					//fullPath(command, argus);
 					fullPath(inputTokens);
-				}
-				catch(IOException e){
-					System.out.println("Command '" + command + "' not recognized");
-					lineCount++;
-				}	
+					}
+					catch(IOException e){
+						System.out.println("Command '" + command + "' not recognized");
+						lineCount++;
+					}
 		}
-	}
 
+}
 	
 	/*
 	 * cd method is called when user enters cd command.
@@ -163,24 +162,6 @@ public class Shell {
 			}
 		}
 	}
-
-	private static void environ(String[] argus){
-		Map<String, String> environMap = System.getenv();
-		SortedMap<String, String> sortedEnvironMap = new TreeMap<String, String>(environMap);
-		Set<String> keySet = sortedEnvironMap.keySet();
-		for (String key : keySet) {
-			String value = environMap.get(key);
-			System.out.println("[" + key + "] " + value);}
-	}
-	private static void echo(String[] argus){   
-		String arguments = "";
-		for (int i = 0;i < argus.length; i++){
-			arguments = arguments + argus[i]+ " ";
-		}
-		System.out.println( user + "\n" + currentDirName + "\n" + arguments);
-		lineCount += 3;    
-	}
-
 	
 	/**
 	 * This method should be able to clear the console screen and should activate when the user types clr.
@@ -189,9 +170,7 @@ public class Shell {
 	 * Let us know how many lines have been printed. This way we can delete them to clear the screen.
 	 */
 	private static void clr(){
-		
 		// This will work on Linux.
-		
 		for (int n = 0; n < lineCount; n++){
 			System.out.print("\033[1A");  //Move up n spaces. 
 			System.out.print("\033[2K");  //Delete current line.
@@ -199,34 +178,10 @@ public class Shell {
 	}
 	
 	/**
-	* Shell should fork and execute programs as child processes.
-	*/
-
-	private static void fullPath(String[] commands) throws IOException {
-		
-		//Shell should contain a full path from where it was executed.
-		final File f = new File(Shell.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-		System.out.println("Shell = " + f);
-		lineCount++;
-		 
-		Process process;
-
-		Thread thread = new Thread();
-		
-		
-	    // In java the process builder command forks a new process and executes. 
-		process = new ProcessBuilder().command(commands).inheritIO().start();
-		System.out.println("Press enter to return to the shell.");
-		lineCount++;
-
-	}
-	
-	/**
 	 * This method should be able to list all the current files in a directory.
 	 * This also takes in a parameter. 
 	 */
 	private static void dir(String[] arg){
-		
 		// If the argument is null then it will print the current directory because the 
 		// cd(arg) method won't change the currentDirName
 		cd(arg);
@@ -255,19 +210,102 @@ public class Shell {
 					System.out.println("No files in current directory.");
 				}
 	}
-    
-	/**
-	 * method is called when shell needs to quit.
-	 * pretty self-explanatory
-	 */
-    private static void quit() {
+	
+	//Echo the string entered after the echo command.
+	private static void echo(String[] argus){   
+		String arguments = "";
+		for (int i = 0;i < argus.length; i++){
+			arguments = arguments + argus[i]+ " ";
+		}
+		System.out.println( user + "\n" + currentDirName + "\n" + arguments);
+		lineCount += 4;    
+	}
+	
+	//Print out environment variables of current machine.
+	private static void environ(String[] argus){
+		Map<String, String> environMap = System.getenv();
+		SortedMap<String, String> sortedEnvironMap = new TreeMap<String, String>(environMap);
+		Set<String> keySet = sortedEnvironMap.keySet();
+		for (String key : keySet) {
+			String value = environMap.get(key);
+			System.out.println("[" + key + "] " + value);}
+	}
+	
+	//Help function uses User Manual.txt to display help commands.
+	private static void help(){
+		  BufferedReader br = null;
+		  String line = null;
+		  
+		  try{
+			  br = new BufferedReader(new FileReader("User Manual.txt"));	  
+		  }
+		  
+		  catch(FileNotFoundException e){
+			  System.out.println(e.getMessage() + "The file was not found");
+		  }
+		  
+		  try{
+			  while((line = br.readLine()) != null){
+				  System.out.println(line);
+				  lineCount++;
+			  }
+		  }
+		  
+		  catch(IOException ex){
+			  System.out.println(ex.getMessage() + "Error reading file");
+		  }
+		  
+		  
+	  }
+	  
+	   private static void quit() {
     	System.out.println("Exiting the shell...");
     	System.exit(0);
+    }
+	
+	/*
+	 * The program remains paused until Enter is pressed
+	 */
+	 private static void pause(){
+		System.out.println("Press enter to unpause the shell");
+		boolean isPaused = true;
+		Scanner scan = new Scanner(System.in);
+		
+		while(isPaused){
+			String input = scan.nextLine();
+			lineCount++;
+			
+			if(input.equals(""))
+				isPaused = false;
+		}	
+		
+	 }
+	
+	//Full path prints the path that the shell program originated from.
+	//If a command is recognized it will fork a child process and execute the command given.
+	private static void fullPath(String[] commands) throws IOException {
+		
+		//Shell should contain a full path from where it was executed.
+		final File f = new File(Shell.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		System.out.println("Shell = " + f);
+		lineCount++;
+	    // In java the process builder command forks a new process and executes. 
+		Process process = new ProcessBuilder().command(commands).inheritIO().start();
+		System.out.println("Press enter to return to the shell.");
+		lineCount++;
+	}
+
+ 	/*
+     * the constructor for the Shell class.
+     * @parameter path - the path of the current directory of the shell
+     */
+    public Shell(String path) {
+      cwd = new File(path);
     }
 
 	/*
 	 * displays basic command prompt
-	 * shows user name and current directory name
+	 * shows username and current directory name
 	 */
 	private static String prompt() {
 		String fileName = currentDir.getName();
@@ -284,50 +322,4 @@ public class Shell {
 		}
 		return result;
 	}
-	
-	
-	private static void help(){
-	       
-		  BufferedReader br = null;
-		  String line = null;
-		  
-		  try{
-			  br = new BufferedReader(new FileReader("User Manual.txt"));	  
-		  }
-		  
-		  catch(FileNotFoundException e){
-			  System.out.println(e.getMessage() + "The file was not found");
-		  }
-		  
-		  try{
-			  while((line = br.readLine()) != null){
-				  System.out.println(line);
-			  }
-		  }
-		  
-		  catch(IOException ex){
-			  System.out.println(ex.getMessage() + "Error reading file");
-		  }
-		  
-		  
-	  }
-	  /*
-	   * The program remains paused until Enter is pressed
-	   */
-	 private static void pause(){
-		System.out.println("Press enter to unpause the shell");
-		boolean isPaused = true;
-		Scanner scan = new Scanner(System.in);
-		
-		while(isPaused){
-			String input = scan.nextLine();
-			lineCount++;
-			
-			if(input.equals(""))
-				isPaused = false;
-		}	
-		
-	 }
-	
-	
 }
