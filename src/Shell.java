@@ -264,7 +264,7 @@ public class Shell {
 	   private static void quit() {
     	System.out.println("Exiting the shell...");
     	loop(true);
-    }
+     }
 	
 	/*
 	 * The program remains paused until Enter is pressed
